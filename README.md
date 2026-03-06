@@ -20,6 +20,8 @@ mkdir remna-routing-updater && cd remna-routing-updater
 ```env
 REMNA_BASE_URL=https://your-host/api
 REMNA_TOKEN=your_bearer_token
+# GITHUB_RAW_URL=https://raw.githubusercontent.com/hydraponique/roscomvpn-happ-routing/refs/heads/main/HAPP/DEFAULT.DEEPLINK
+# CHECK_INTERVAL=300
 ```
 
 Создайте файл `docker-compose.yml`:
