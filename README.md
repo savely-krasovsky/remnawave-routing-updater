@@ -15,6 +15,8 @@
 mkdir remna-routing-updater && cd remna-routing-updater
 ```
 
+### Внешняя панель (HTTPS)
+
 Создайте файл `.env`:
 
 ```env
@@ -35,6 +37,42 @@ services:
     env_file:
       - .env
 ```
+
+### Локальная панель (Docker)
+
+Если RemnaWave панель запущена локально в Docker (образ `remnawave/backend:latest`), контейнер updater нужно подключить к той же сети `remnawave-network` и обращаться к панели по имени контейнера.
+
+Создайте файл `.env`:
+
+```env
+REMNA_BASE_URL=http://remnawave-backend:3000/api
+REMNA_TOKEN=your_bearer_token
+# GITHUB_RAW_URL=https://raw.githubusercontent.com/hydraponique/roscomvpn-happ-routing/refs/heads/main/HAPP/DEFAULT.DEEPLINK
+# CHECK_INTERVAL=300
+```
+
+> `remnawave-backend` — имя контейнера панели, `3000` — порт по умолчанию. Измените при необходимости.
+
+Создайте файл `docker-compose.yml`:
+
+```yaml
+services:
+  routing-updater:
+    image: ghcr.io/lifeindarkside/remnawave-routing-update:latest
+    container_name: remna-routing-updater
+    restart: unless-stopped
+    env_file:
+      - .env
+    networks:
+      - remnawave-network
+
+networks:
+  remnawave-network:
+    name: remnawave-network
+    external: true
+```
+
+> Сеть `remnawave-network` должна уже существовать (создаётся docker-compose панели RemnaWave).
 
 Запуск:
 
@@ -59,7 +97,7 @@ docker compose up -d
 
 | Переменная | Обязательная | По умолчанию | Описание |
 |---|---|---|---|
-| `REMNA_BASE_URL` | да | — | Базовый URL API Remna (например `https://host/api`) |
+| `REMNA_BASE_URL` | да | — | Базовый URL API Remna (например `https://host/api` или `http://remnawave-backend:3000/api`) |
 | `REMNA_TOKEN` | да | — | Bearer-токен для авторизации в Remna API |
 | `GITHUB_RAW_URL` | нет | [DEFAULT.DEEPLINK](https://raw.githubusercontent.com/hydraponique/roscomvpn-happ-routing/refs/heads/main/HAPP/DEFAULT.DEEPLINK) | URL файла с роутингом на GitHub |
 | `CHECK_INTERVAL` | нет | `300` | Интервал проверки обновлений (в секундах) |

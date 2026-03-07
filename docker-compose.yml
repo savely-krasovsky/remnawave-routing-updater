@@ -5,3 +5,10 @@ services:
     restart: unless-stopped
     env_file:
       - .env
+    networks:
+      - remnawave-network
+
+networks:
+  remnawave-network:
+    name: remnawave-network
+    external: true

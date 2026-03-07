@@ -2,6 +2,7 @@ import os
 import time
 import logging
 import requests
+import urllib3
 
 logging.basicConfig(
     level=logging.INFO,
@@ -17,6 +18,10 @@ GITHUB_RAW_URL = os.environ.get(
     "https://raw.githubusercontent.com/hydraponique/roscomvpn-happ-routing/refs/heads/main/HAPP/DEFAULT.DEEPLINK",
 )
 CHECK_INTERVAL = int(os.environ.get("CHECK_INTERVAL", "300"))  # seconds
+SSL_VERIFY = REMNA_BASE_URL.startswith("https://")
+
+if not SSL_VERIFY:
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 def get_remna_settings() -> dict:
@@ -27,6 +32,7 @@ def get_remna_settings() -> dict:
             "Authorization": f"Bearer {REMNA_TOKEN}",
         },
         timeout=30,
+        verify=SSL_VERIFY,
     )
     resp.raise_for_status()
     return resp.json()
@@ -42,6 +48,7 @@ def patch_remna_settings(payload: dict) -> dict:
         },
         json=payload,
         timeout=30,
+        verify=SSL_VERIFY,
     )
     resp.raise_for_status()
     return resp.json()
