@@ -1,13 +1,15 @@
 # Remna Routing Updater
 
-Микросервис для автоматического обновления `happRouting` в Remna панели при появлении новых данных в GitHub-репозитории [roscomvpn-happ-routing](https://github.com/hydraponique/roscomvpn-happ-routing).
+Микросервис для автоматического обновления `happRouting` в Remna панели при появлении новых данных в GitHub-репозитории с routing-конфигурацией.
 
 ## Как работает
 
 1. При запуске получает текущие настройки подписки из Remna API (`GET /subscription-settings`)
-2. Периодически проверяет файл `DEFAULT.DEEPLINK` в GitHub-репозитории
-3. Если содержимое изменилось — отправляет обновление в Remna (`PATCH /subscription-settings`)
-4. Если изменений нет — ничего не делает
+2. Периодически проверяет GitHub-файл с routing-конфигурацией
+3. Если источник содержит JSON, собирает из него финальный `happ://routing/onadd/...`
+4. При необходимости добавляет дополнительное правило в `DirectSites`
+5. Если итоговый deeplink изменился — отправляет обновление в Remna (`PATCH /subscription-settings`)
+6. Если изменений нет — ничего не делает
 
 ## Быстрый старт
 
@@ -22,7 +24,8 @@ mkdir remna-routing-updater && cd remna-routing-updater
 ```env
 REMNA_BASE_URL=https://your-host/api
 REMNA_TOKEN=your_bearer_token
-# GITHUB_RAW_URL=https://raw.githubusercontent.com/hydraponique/roscomvpn-happ-routing/refs/heads/main/HAPP/DEFAULT.DEEPLINK
+# EXTRA_DIRECT_SITE=domain:example.com
+# GITHUB_RAW_URL=https://raw.githubusercontent.com/hydraponique/roscomvpn-routing/refs/heads/main/HAPP/DEFAULT.JSON
 # CHECK_INTERVAL=300
 ```
 
@@ -47,7 +50,8 @@ services:
 ```env
 REMNA_BASE_URL=http://remnawave-backend:3000/api
 REMNA_TOKEN=your_bearer_token
-# GITHUB_RAW_URL=https://raw.githubusercontent.com/hydraponique/roscomvpn-happ-routing/refs/heads/main/HAPP/DEFAULT.DEEPLINK
+# EXTRA_DIRECT_SITE=domain:example.com
+# GITHUB_RAW_URL=https://raw.githubusercontent.com/hydraponique/roscomvpn-routing/refs/heads/main/HAPP/DEFAULT.JSON
 # CHECK_INTERVAL=300
 ```
 
@@ -99,7 +103,8 @@ docker compose up -d
 |---|---|---|---|
 | `REMNA_BASE_URL` | да | — | Базовый URL API Remna (например `https://host/api` или `http://remnawave-backend:3000/api`) |
 | `REMNA_TOKEN` | да | — | Bearer-токен для авторизации в Remna API |
-| `GITHUB_RAW_URL` | нет | [DEFAULT.DEEPLINK](https://raw.githubusercontent.com/hydraponique/roscomvpn-happ-routing/refs/heads/main/HAPP/DEFAULT.DEEPLINK) | URL файла с роутингом на GitHub |
+| `EXTRA_DIRECT_SITE` | нет | — | Дополнительное правило, которое добавляется в `DirectSites` перед обновлением, например `domain:example.com` |
+| `GITHUB_RAW_URL` | нет | [DEFAULT.JSON](https://raw.githubusercontent.com/hydraponique/roscomvpn-routing/refs/heads/main/HAPP/DEFAULT.JSON) | URL источника роутинга на GitHub. Поддерживается как JSON, так и готовый deeplink |
 | `CHECK_INTERVAL` | нет | `300` | Интервал проверки обновлений (в секундах) |
 
 ## Логи
