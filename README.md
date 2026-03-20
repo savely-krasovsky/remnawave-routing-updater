@@ -34,7 +34,7 @@ REMNA_TOKEN=your_bearer_token
 ```yaml
 services:
   routing-updater:
-    image: ghcr.io/lifeindarkside/remnawave-routing-update:latest
+    image: ghcr.io/savely-krasovsky/remnawave-routing-updater:latest
     container_name: remna-routing-updater
     restart: unless-stopped
     env_file:
@@ -62,7 +62,7 @@ REMNA_TOKEN=your_bearer_token
 ```yaml
 services:
   routing-updater:
-    image: ghcr.io/lifeindarkside/remnawave-routing-update:latest
+    image: ghcr.io/savely-krasovsky/remnawave-routing-updater:latest
     container_name: remna-routing-updater
     restart: unless-stopped
     env_file:
